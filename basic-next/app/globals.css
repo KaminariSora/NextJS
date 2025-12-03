@@ -4,3 +4,13 @@
    --tertiary-color: #FFF0F5;
    --secondary-text-color: #D81B60;
 }
+
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+
+body {
+   padding-top: 6rem;
+}

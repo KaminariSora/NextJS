@@ -1,5 +1,4 @@
 .profileBar {
-    position: fixed;
     width: 100%;
     height: 3rem;
     z-index: 100;
@@ -32,9 +31,39 @@
     justify-content: space-between;
     min-width: 40%;
     flex-direction: row;
+    position: relative;
+}
+
+.profile-NavList:hover {
+    cursor: pointer;
 }
 
 .profileBar-container ul li .navLink {
     color: #D81B60;
     font-size: 1.2rem;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 2rem;
+    background: var(--tertiary-color);
+    display: flex;
+    flex-direction: column;
+    padding: .5rem;
+    word-spacing: normal;
+}
+
+.dropdown-menu a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 1.2rem;
+    /* padding: .5rem; */
+}
+
+.dropdown-menu ul li:hover {
+    background: #D81B60;
+}
+
+.dropdown-menu li:hover .dropdown-link {
+    color: var(--secondary-text-color); 
 }

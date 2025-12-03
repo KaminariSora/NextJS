@@ -12,17 +12,14 @@
     justify-content: center;
     flex-direction: column;
     width: auto;
-    margin-top: 13rem;
 }
 
 #market-heading {
-    margin-top: 10rem;
-    margin-bottom: 3rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     color: #333;
     text-align: start;
-    left: 10%;
-    top: 0%;
-    position: absolute;
+    position: relative;
 }
 
 #market-heading::before {

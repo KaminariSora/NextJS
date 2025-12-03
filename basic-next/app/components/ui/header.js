@@ -16,12 +16,12 @@ const Header = () => {
                     {/* NavMenu */}
                     <div className={`navMenu ${showMenu ? 'showMenu' : ''}`}>
                         <ul className="navList" type="none">
-                            <li className="listItem"><a to="/Home" className='quicksand navLink'>Home</a></li>
-                            <li className="listItem"><a to="/Member" className='quicksand navLink'>Member</a></li>
-                            <li className="listItem"><a to="/Song" className='quicksand navLink'>Song</a></li>
-                            <li className="listItem"><a to="/Market" className='quicksand navLink'>Market</a></li>
-                            <li className="listItem"><a to="/Company" className='quicksand navLink'>Company</a></li>
-                            <li className="listItem"><a to="/Contact" className='quicksand navLink'>Contact</a></li>
+                            <li className="listItem"><a href="/" className='quicksand navLink'>Home</a></li>
+                            {/* <li className="listItem"><a href="/member" className='quicksand navLink'>Member</a></li> */}
+                            <li className="listItem"><a href="/song" className='quicksand navLink'>Song</a></li>
+                            <li className="listItem"><a href="/market" className='quicksand navLink'>Market</a></li>
+                            {/* <li className="listItem"><a href="/company" className='quicksand navLink'>Company</a></li> */}
+                            {/* <li className="listItem"><a href="/contact" className='quicksand navLink'>Contact</a></li> */}
                         </ul>
                         <div className="navClose" onClick={ToggleMenu}>
                             <FontAwesomeIcon icon={faXmark} />

@@ -43,7 +43,11 @@ export default async function TestPage({ searchParams: searchParamsPromise }) {
 
                 <div className="market-list">
                     {currentItems.map((item, index) => (
-                        <ItemList key={index} {...item} />
+                        <ItemList key={item._id ?? index}
+                            src={item.image ?? item.src}      // ปรับตามชื่อ field ที่มีใน DB
+                            alt={item.name ?? "No picture"}   // ใช้ name เป็น alt ชั่วคราว
+                            text={item.name}                  // ชื่อสินค้าที่เคยใช้ตอน render ปกติ
+                            price={item.price} />
                     ))}
                 </div>
             </div>

@@ -1,5 +1,6 @@
 // app/pagination/pagination.js
 import Link from "next/link"
+import "./test.css"
 
 export default function Pagination({ currentPage, totalPages }) {
   if (totalPages <= 1) return null

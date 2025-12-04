@@ -1,0 +1,30 @@
+body {
+    padding: 0;
+}
+
+.admin-container {
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    background-color: black;
+    color: white;
+}
+
+.admin-container form {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-direction: column;
+    background: gray;
+    padding: 2rem;
+    font-size: 1.5rem;
+}
+
+form .admin-inputbox {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}

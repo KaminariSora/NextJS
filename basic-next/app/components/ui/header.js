@@ -1,3 +1,5 @@
+"use client"
+
 import './navBar.css'
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

@@ -1,0 +1,25 @@
+async function getData() {
+    const response = await fetch("http://localhost:3000/product/getData", {
+        method: "GET",
+        cache: "no-store"
+    });
+    const json = await response.json();
+
+    return json.data;
+}
+
+export default async function TestPage() {
+    const datas = await getData()
+    return (
+        <div>
+            TestPage
+            {
+                datas.map((data, index) => (
+                    <div key={index}>
+                        {data.name}
+                    </div>
+                ))
+            }
+        </div>
+    )
+}

@@ -61,7 +61,8 @@ export default async function TestPage({ searchParams: searchParamsPromise }) {
     )
 }
 
-
+// ตอนนี้ Itemlists มี value ออกมาแค่ Price ค่าอื่นๆยังไม่ออกมา
+// คิดว่าน่าจะมีปัญหาที่ส่งData ไม่ก็ ItemLists แหละ
 
 
 

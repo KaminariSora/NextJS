@@ -1,4 +1,3 @@
-// app/pagination/pagination.js
 import Link from "next/link"
 
 export default function Pagination({ currentPage, totalPages }) {
@@ -9,8 +8,8 @@ export default function Pagination({ currentPage, totalPages }) {
   return (
     <nav className="pagination" aria-label="Product pages">
       {currentPage > 1 && (
-        <Link href={`?page=${currentPage - 1}`} className="page-link">
-          Prev
+        <Link href={`?page=${currentPage - 1}`} className="page-btn">
+          &lt;
         </Link>
       )}
 
@@ -19,15 +18,15 @@ export default function Pagination({ currentPage, totalPages }) {
           key={page}
           href={`?page=${page}`}
           aria-current={page === currentPage ? "page" : undefined}
-          className={`page-link ${page === currentPage ? "active-page" : ""}`}
+          className={`page-btn ${page === currentPage ? "active" : ""}`}
         >
           {page}
         </Link>
       ))}
 
       {currentPage < totalPages && (
-        <Link href={`?page=${currentPage + 1}`} className="page-link">
-          Next
+        <Link href={`?page=${currentPage + 1}`} className="page-btn">
+          &gt;
         </Link>
       )}
     </nav>

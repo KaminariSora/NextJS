@@ -2,6 +2,8 @@ import Pagination from "./pagination"
 import "./market.css"
 import ProfileBar from "@/app/components/ui/profileBar"
 import ItemList from "@/app/components/ui/itemList"
+import ClientMarket from "./cliientMarket"
+// import { useState } from "react"
 
 async function getData() {
     const response = await fetch("http://localhost:3000/product/getData", {
@@ -13,6 +15,8 @@ async function getData() {
 }
 
 export default async function TestPage({ searchParams: searchParamsPromise }) {
+    // const [active, setActive] = useState(false)
+
     // ✅ ต้อง await ก่อน
     const searchParams = await searchParamsPromise
 
@@ -35,38 +39,18 @@ export default async function TestPage({ searchParams: searchParamsPromise }) {
     return (
         <div className="market-body">
             <ProfileBar />
-
-            <div className="market-container">
-                <h1 className="mitr-regular" id="market-heading">
-                    สินค้าทั้งหมด(แค่ตัวอย่างไม่ได้ขายจริง)
-                </h1>
-
-                <div className="market-list">
-                    {currentItems.map((item, index) => (
-                        <ItemList key={item._id ?? index}
-                            src={item.image ?? item.src}      // ปรับตามชื่อ field ที่มีใน DB
-                            alt={item.name ?? "No picture"}   // ใช้ name เป็น alt ชั่วคราว
-                            text={item.name}                  // ชื่อสินค้าที่เคยใช้ตอน render ปกติ
-                            price={item.price} />
-                    ))}
-                </div>
-            </div>
-
+            <ClientMarket items={currentItems}/>
             <br />
-
             <Pagination currentPage={currentPage} totalPages={totalPages} />
 
-            {/* <button className="chatbot-btn" onClick={handleChatbotPopup}>
+            <button className="chatbot-btn" onClick={handleChatbotPopup}>
                 <ChatIcon />
-            </button> */}
+            </button>
             {/* {isChatOpen && <AiModule />} */}
         </div>
 
     )
 }
-
-// ตอนนี้ Itemlists มี value ออกมาแค่ Price ค่าอื่นๆยังไม่ออกมา
-// คิดว่าน่าจะมีปัญหาที่ส่งData ไม่ก็ ItemLists แหละ
 
 
 

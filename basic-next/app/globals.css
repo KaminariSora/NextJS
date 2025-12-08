@@ -25,3 +25,23 @@
 body {
    padding-top: 6rem;
 }
+
+/* -------Chatbot icon------- */
+
+.chatbot-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    font-size: 2rem;
+    color: var(--primary-color);
+    padding: 1rem;
+    background: var(--tertiary-color);
+    border-radius: 50%;
+}
+
+.chatbot-btn:hover {
+   background: var(--highlight-button-color);
+   color: var(--secondary-color);
+   transition: all ease .2s;
+}

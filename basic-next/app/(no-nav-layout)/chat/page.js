@@ -10,7 +10,7 @@ import DOMPurify from "dompurify";
 
 // const LOCAL_WEBHOOK_URL = "https://76c45653f311.ngrok-free.app/webhook/ReactChat";
 const LOCAL_WEBHOOK_URL = "http://localhost:5678/webhook/ReactChat";
-const STORAGE_KEY = "chat_conversations_v1";
+const STORAGE_KEY = "market_chat_conversations_v1";
 
 const MODELS = [
     { id: "gemini 1.5-flash", label: "Gemini 1.5-flash" },

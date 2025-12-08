@@ -1,8 +1,6 @@
-// main.js
 const { MongoClient, ObjectId } = require('mongodb');
 const { generateEmbedding } = require('./embedding');
 
-// 1. ดึง Environment Variables โดยตรง
 const MONGO_URI = process.env.MONGO_URI;
 const DB_NAME = process.env.DB_NAME;
 const COLLECTION_NAME = process.env.COLLECTION_NAME;

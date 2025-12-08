@@ -1,8 +1,19 @@
 :root {
-   --primary-color: #FF6EC7; 
+   --primary-color: #FF6EC7;
    --secondary-color: #fff;
    --tertiary-color: #FFF0F5;
    --secondary-text-color: #D81B60;
+   --font-color: #D81B60;
+   --secondary-font-color: #FF6EC7;
+   --tertiary-text-color: #fff;
+   --background: #fff;
+   --background-rgb: 51, 51, 51;
+   --navbar-color: #fff;
+   --pop-up-background-color: #FFF0F5;
+   --hover-pop-up-background-color: #FF6EC7;
+   --highlight-navbar-color: #FF6EC7;
+   --highlight-button-color: #FF6EC7;
+   --hover-highlight-navbar-color: #FF6EC7;
 }
 
 * {

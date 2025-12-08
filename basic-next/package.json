@@ -13,13 +13,16 @@
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^3.1.1",
     "axios": "^1.13.2",
+    "dompurify": "^3.3.0",
     "framer-motion": "^12.23.25",
     "gsap": "^3.13.0",
     "mongoose": "^9.0.0",
     "next": "16.0.1",
     "ogl": "^1.0.11",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "babel-plugin-react-compiler": "1.0.0"

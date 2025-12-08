@@ -43,9 +43,9 @@ export default async function TestPage({ searchParams: searchParamsPromise }) {
             <br />
             <Pagination currentPage={currentPage} totalPages={totalPages} />
 
-            <button className="chatbot-btn" onClick={handleChatbotPopup}>
+            {/* <button className="chatbot-btn" onClick={handleChatbotPopup}>
                 <ChatIcon />
-            </button>
+            </button> */}
             {/* {isChatOpen && <AiModule />} */}
         </div>
 

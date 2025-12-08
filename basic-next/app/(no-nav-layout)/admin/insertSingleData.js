@@ -44,6 +44,7 @@ async function upsertProduct(productData) {
                 description: productData.description,
                 stock: productData.stock,
                 image: productData.image,
+                genre: productData.genre,
                 product_embedding: vectorEmbedding
             }
         };

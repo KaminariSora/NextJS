@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane, faCopy, faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane, faCopy, faEllipsis, faImage } from "@fortawesome/free-solid-svg-icons";
 import './chat.css'
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import DOMPurify from "dompurify";
 
 // const LOCAL_WEBHOOK_URL = "https://76c45653f311.ngrok-free.app/webhook/ReactChat";
-const LOCAL_WEBHOOK_URL = "http://localhost:5678/webhook/ReactChat";
+const LOCAL_WEBHOOK_URL = "http://localhost:5678/webhook-test/chat-input";
 const STORAGE_KEY = "market_chat_conversations_v1";
 
 const MODELS = [
@@ -21,27 +21,60 @@ const MODELS = [
 const makeId = () =>
     Date.now().toString() + Math.random().toString(16).slice(2);
 
+// 💡 NEW: ฟังก์ชันสำหรับแปลง URL รูปภาพในข้อความธรรมดาให้เป็น Markdown Image Syntax
+const convertUrlsToMarkdown = (text) => {
+    // 💡 แก้ไข Regex: ลบ $ ออกเพื่อให้จับคู่ URL ที่ไม่ได้อยู่จบสตริง
+    // และเพิ่ม \n\n หน้า URL เพื่อให้ ReactMarkdown ขึ้นบรรทัดใหม่และ render เป็น Block element
+    // Regex: ค้นหา URL ที่ลงท้ายด้วยนามสกุลรูปภาพ
+    const imageRegex = /(https?:\/\/[^\s]+?\.(jpe?g|png|gif|webp|svg|bmp))(\s*)/gi;
+
+    let result = text;
+    
+    // แปลง URL รูปภาพเป็น Markdown Image
+    // เราใช้ replaceAll เพื่อให้มั่นใจว่าครอบคลุมการค้นหาทั้งหมด (แม้ว่า .replace กับ flag g จะทำงานคล้ายกัน)
+    // การเพิ่ม \n\n จะช่วยแยกรูปภาพออกจากข้อความด้านบน
+    result = result.replace(imageRegex, (match, url, spacing) => {
+        // Alt Text ง่ายๆ
+        return `\n\n![Image](${url})${spacing}`; 
+    });
+
+    return result;
+};
+
 export default function Chat() {
-    const [conversations, setConversations] = useState(() => {
+    // 💡 HYDRATION FIX: ตั้งค่าเริ่มต้นเป็น []
+    const [imageFile, setImageFile] = useState(null);
+    const [isMounted, setIsMounted] = useState(false); // 💡 NEW: State เพื่อจัดการ Hydration
+
+    // 💡 HYDRATION FIX: กำหนดค่าเริ่มต้นเป็น [] เพื่อให้เซิร์ฟเวอร์เรนเดอร์เนื้อหาที่ว่างเปล่า (หรือ Loading)
+    const [conversations, setConversations] = useState([]);
+
+    // 💡 HYDRATION FIX: โหลดข้อมูลจริงจาก Local Storage ใน useEffect
+    useEffect(() => {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
+            let initialConversations = [
+                {
+                    id: makeId(),
+                    title: "New chat",
+                    messages: [{ id: makeId(), role: "bot", text: "Hello. Can I help you?" }],
+                },
+            ];
+
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (Array.isArray(parsed) && parsed.length) return parsed;
+                if (Array.isArray(parsed) && parsed.length) {
+                    initialConversations = parsed;
+                }
             }
+
+            setConversations(initialConversations);
         } catch (e) {
             console.warn("Cannot load conversations:", e);
         }
-        return [
-            {
-                id: makeId(),
-                title: "New chat",
-                messages: [
-                    { id: makeId(), role: "bot", text: "Hello. Can I help you?" },
-                ],
-            },
-        ];
-    });
+
+        setIsMounted(true); // ตั้งค่าเป็น true เมื่อโหลดข้อมูลฝั่ง Client เสร็จสิ้น
+    }, []);
 
     const [activeId, setActiveId] = useState("c1");
     const activeConversation = conversations.find((c) => c.id === activeId);
@@ -54,22 +87,27 @@ export default function Chat() {
     const [openFormId, setOpenFormId] = useState(null);
     const chatBodyRef = useRef(null);
     const historyButtonRef = useRef(null)
+    const fileInputRef = useRef(null);
     const [editingId, setEditingId] = useState(null);
     const [draftTitle, setDraftTitle] = useState("");
 
+    // 💡 HYDRATION FIX: รัน Scroll และ Local Storage Persist เมื่อ Mounted แล้วเท่านั้น
     useEffect(() => {
+        if (!isMounted) return;
         const el = chatBodyRef.current;
         if (el) el.scrollTop = el.scrollHeight;
-    }, [conversations]);
+    }, [conversations, isMounted]);
 
     useEffect(() => {
+        if (!isMounted) return;
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
         } catch (e) {
             console.warn("Cannot persist conversations:", e);
         }
-    }, [conversations]);
+    }, [conversations, isMounted]);
 
+    // ... (ส่วน openClearHistoryWindow, handleConfirmClearHistory, useEffect handleClickOutside เหมือนเดิม)
     const openClearHistoryWindow = () => {
         setClearConfirm(true);
     };
@@ -102,15 +140,22 @@ export default function Chat() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const text = userMessage.trim();
-        if (!text || status === "loading" || !activeConversation) return;
+        const hasImage = !!imageFile;
+
+        if ((!text && !hasImage) || status === "loading" || !activeConversation) return;
 
         setStatus("loading");
         setError("");
         setUserMessage("");
 
-        const loadingId = makeId();
+        const file = imageFile;
 
-        // ดึงห้องปัจจุบัน + sessionId เดิม (หรือสร้างใหม่แล้วผูกกลับเข้า state)
+        setImageFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+
+        const loadingId = makeId();
         const current = conversations.find((c) => c.id === activeId);
         let sessionId = current?.sessionId;
         if (!sessionId) {
@@ -120,7 +165,20 @@ export default function Chat() {
             );
         }
 
-        // render ข้อความ user + บับเบิลกำลังคิด
+        let imagePreviewUrl = null;
+        if (hasImage && file) {
+            try {
+                imagePreviewUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            } catch (error) {
+                console.error("Error reading file:", error);
+            }
+        }
+
         setConversations((prev) =>
             prev.map((conv) => {
                 if (conv.id !== activeId) return conv;
@@ -128,28 +186,35 @@ export default function Chat() {
                 return {
                     ...conv,
                     title: isFirstUserMsg
-                        ? text.length > 40
-                            ? text.slice(0, 40) + "..."
-                            : text
+                        ? (text || "Photo").slice(0, 40) + ((text?.length > 40) ? "..." : "")
                         : conv.title,
                     messages: [
                         ...conv.messages,
-                        { id: Date.now() - 1, role: "user", text },
+                        { id: Date.now() - 1, role: "user", text, imageUrl: imagePreviewUrl },
                         { id: loadingId, role: "bot", text: `thinking with ${model}...` },
                     ],
                 };
             })
         );
 
+        const formData = new FormData();
+        formData.append("text", text);
+        formData.append("model", model);
+        formData.append("sessionId", sessionId);
+        if (hasImage && file) {
+            formData.append("image", file, file.name);
+        }
+
         try {
             const r = await fetch(LOCAL_WEBHOOK_URL, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text, model, sessionId }),
+                body: formData,
             });
 
             const ctype = r.headers.get("content-type") || "";
-            const data = ctype.includes("application/json") ? await r.json() : { message: await r.text() };
+            const data = ctype.includes("application/json")
+                ? await r.json()
+                : { message: await r.text() };
             if (!r.ok) throw new Error(data?.message || `HTTP ${r.status}`);
 
             const reply = data?.message ?? data?.answer ?? data?.output ?? JSON.stringify(data);
@@ -186,8 +251,23 @@ export default function Chat() {
         }
     };
 
-    // (ของเดิม)
-    const enhance = (md = "") => md.replace(/\*\*มติ:\*\*/g, "**มติ:**");
+    const convertUrlsToMarkdown = (text) => {
+        const imageRegex = /(https?:\/\/[^\s]+?\.(jpe?g|png|gif|webp|svg|bmp))\s*$/i;
+
+        let result = text;
+        result = result.replace(imageRegex, (match, url) => {
+            return `![Image](${url})`;
+        });
+
+        return result;
+    };
+
+    const enhance = (md = "") => {
+        let result = md.replace(/\*\*มติ:\*\*/g, "**มติ:**");
+        result = convertUrlsToMarkdown(result);
+        return result;
+    }
+
     const sanitize = (md = "") => DOMPurify.sanitize(md);
     const sanitizeTitle = (t) => {
         const s = (t ?? "").trim();
@@ -222,6 +302,14 @@ export default function Chat() {
         setEditingId(null);
         setDraftTitle("");
     };
+
+    if (!isMounted) {
+        return (
+            <div className="content-container">
+                <div className="loading-overlay">Loading chat history...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="content-container">
@@ -265,7 +353,6 @@ export default function Chat() {
                                 className={conv.id === activeId ? "active selected" : ""}
                                 onClick={() => setActiveId(conv.id)}
                             >
-                                {/* ชื่อแชท: โหมดดู / โหมดแก้ */}
                                 {editingId === conv.id ? (
                                     <input
                                         className="rename-input"
@@ -307,6 +394,7 @@ export default function Chat() {
                                                 onClick={() => {
                                                     setConversations(prev => prev.filter(c => c.id !== conv.id));
                                                     if (conv.id === activeId) {
+                                                        // เลือกแชทถัดไป ถ้ามีหลายแชท
                                                         const next = conversations.find(c => c.id !== conv.id);
                                                         if (next) setActiveId(next.id);
                                                     }
@@ -333,6 +421,14 @@ export default function Chat() {
                                     }`}
                             >
                                 <div className="message-body">
+                                    {/* แสดงรูปภาพที่แนบมากับข้อความของผู้ใช้ (Base64 URL) */}
+                                    {m.imageUrl && (
+                                        <img
+                                            src={m.imageUrl}
+                                            alt="uploaded"
+                                            className="message-image-preview"
+                                        />
+                                    )}
                                     <ReactMarkdown
                                         remarkPlugins={[remarkGfm]}
                                         components={{
@@ -384,6 +480,7 @@ export default function Chat() {
                                             ),
                                         }}
                                     >
+                                        {/* 💡 ข้อความบอทจะผ่าน enhance ซึ่งมีการแปลง URL รูปภาพ */}
                                         {sanitize(enhance(m.text))}
                                     </ReactMarkdown>
                                 </div>
@@ -401,6 +498,42 @@ export default function Chat() {
                     </div>
                     <div className="chat-footer">
                         <form className="chat-form" onSubmit={handleSubmit}>
+                            <label
+                                htmlFor="file-upload"
+                                className={`attach-btn ${status === "loading" ? "disabled" : ""}`}
+                                title="แนบรูปภาพ"
+                            >
+                                <FontAwesomeIcon icon={faImage} size="lg" />
+                            </label>
+                            <input
+                                id="file-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                                disabled={status === "loading"}
+                                style={{ display: "none" }}
+                                ref={fileInputRef}
+                            />
+
+                            {/* 💡 แสดงชื่อไฟล์ที่เลือก */}
+                            {imageFile && (
+                                <div className="file-info">
+                                    {imageFile.name}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setImageFile(null);
+                                            if (fileInputRef.current) {
+                                                fileInputRef.current.value = "";   // เคลียร์ input ด้วย
+                                            }
+                                        }}
+                                        title="ลบรูปภาพที่แนบ"
+                                    >
+                                        &times;
+                                    </button>
+
+                                </div>
+                            )}
                             <input
                                 type="text"
                                 placeholder={
@@ -411,10 +544,14 @@ export default function Chat() {
                                 className="message-input"
                                 value={userMessage}
                                 onChange={(e) => setUserMessage(e.target.value)}
-                                required
+                                required={!imageFile}
                                 disabled={status === "loading"}
                             />
-                            <button type="submit" disabled={status === "loading"} aria-label="Send">
+                            <button
+                                type="submit"
+                                disabled={status === "loading" || (!userMessage.trim() && !imageFile)}
+                                aria-label="Send"
+                            >
                                 <FontAwesomeIcon icon={faPaperPlane} size="lg" />
                             </button>
                         </form>

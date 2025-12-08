@@ -9,6 +9,7 @@ const Admin = () => {
     const [descriptionValue, setDescriptionValue] = useState("")
     const [stockValue, setStockValue] = useState()
     const [imageValue, setImageValue] = useState("")
+    const [genreValue, setGenreValue] = useState("Realistic/Figurative")
 
     const handleNameChange = (e) => {
         setNameValue(e.target.value)
@@ -26,16 +27,21 @@ const Admin = () => {
         setImageValue(e.target.value)
     }
 
+    const handleGenreChange = (e) => {
+        setGenreValue(e.target.value)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newproduct = makingJson(nameValue, priceValue, descriptionValue, stockValue, imageValue)
+        const newproduct = makingJson(nameValue, priceValue, descriptionValue, stockValue, imageValue, genreValue)
         console.log(newproduct)
         const productData = {
             name: nameValue,
             price: parseFloat(priceValue),
             description: descriptionValue,
             stock: parseInt(stockValue, 10),
-            image: imageValue
+            image: imageValue,
+            genre: genreValue
         };
 
         try {
@@ -63,13 +69,14 @@ const Admin = () => {
         }
     }
 
-    const makingJson = (name, price, description, stock, image) => {
+    const makingJson = (name, price, description, stock, image, genre) => {
         const productData = {
             name,
             price,
             description,
             stock,
-            image
+            image,
+            genre
         }
         return productData
     }
@@ -97,6 +104,22 @@ const Admin = () => {
                 <div className='admin-inputbox'>
                     <label>Image link</label>
                     <input type='text' value={imageValue} onChange={handleImageLinkChange} required></input>
+                </div>
+                <div className='admin-inputbox'>
+                    <label>Genre/Image Type</label>
+                    <select
+                        value={genreValue}
+                        onChange={handleGenreChange}
+                        required>
+                        <option value="Realistic/Figurative">Realistic / Figurative</option>
+                        <option value="Portrait">Portrait</option>
+                        <option value="Still Life">Still Life</option>
+                        <option value="Landscape/Cityscape">Landscape / Cityscape</option>
+                        <option value="Abstract">Abstract</option>
+                        <option value="Anime/Manga Style">Anime/Manga Style</option>
+                        <option value="Cartoon/Comic Style">Cartoon/Comic Style</option>
+                        <option value="Impressionism">Impressionism</option>
+                    </select>
                 </div>
                 <button type='submit'>Submit button</button>
             </form>

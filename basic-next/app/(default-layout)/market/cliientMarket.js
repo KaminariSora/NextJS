@@ -4,7 +4,6 @@ import ItemList from "@/app/components/ui/itemList"
 import { useState } from "react"
 
 export default function ClientMarket({items}) {
-    const [active, setActive] = useState(false)
 
     return (
         <div className="market-container">
@@ -15,9 +14,9 @@ export default function ClientMarket({items}) {
             <div className="market-list">
                 {items.map((item, index) => (
                     <ItemList key={item._id ?? index}
-                        src={item.image ?? item.src}      // ปรับตามชื่อ field ที่มีใน DB
-                        alt={item.name ?? "No picture"}   // ใช้ name เป็น alt ชั่วคราว
-                        text={item.name}                  // ชื่อสินค้าที่เคยใช้ตอน render ปกติ
+                        src={item.image ?? item.src}
+                        alt={item.name ?? "No picture"}
+                        text={item.name}
                         price={item.price} />
                 ))}
             </div>

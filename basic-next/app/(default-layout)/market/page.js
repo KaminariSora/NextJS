@@ -3,7 +3,7 @@ import "./market.css"
 import ProfileBar from "@/app/components/ui/profileBar"
 import ItemList from "@/app/components/ui/itemList"
 import ClientMarket from "./cliientMarket"
-// import { useState } from "react"
+import ChatIcon from "@/app/components/icons/chatIcon"
 
 async function getData() {
     const response = await fetch("http://localhost:3000/product/getData", {
@@ -42,11 +42,6 @@ export default async function TestPage({ searchParams: searchParamsPromise }) {
             <ClientMarket items={currentItems}/>
             <br />
             <Pagination currentPage={currentPage} totalPages={totalPages} />
-
-            {/* <button className="chatbot-btn" onClick={handleChatbotPopup}>
-                <ChatIcon />
-            </button> */}
-            {/* {isChatOpen && <AiModule />} */}
         </div>
 
     )

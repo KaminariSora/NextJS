@@ -310,10 +310,6 @@ body {
 /* ---------- Footer zone ---------- */
 
 .content-container .chat-footer {
-    /* position: fixed; */
-    /* bottom: 0;
-    left: 50%;
-    transform: translateX(-50%); */
     width: 100%;
     padding: 15px 22px 20px;
     align-items: center;
@@ -342,6 +338,10 @@ body {
     height: 47px;
     padding: 0 17px;
     font-size: 0.95rem;
+}
+
+.chat-form #file-upload:hover {
+    cursor: pointer;
 }
 
 .chat-form button {

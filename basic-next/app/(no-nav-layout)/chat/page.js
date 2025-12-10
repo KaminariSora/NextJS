@@ -9,7 +9,7 @@ import remarkGfm from "remark-gfm";
 import DOMPurify from "dompurify";
 
 // const LOCAL_WEBHOOK_URL = "https://76c45653f311.ngrok-free.app/webhook/ReactChat";
-const LOCAL_WEBHOOK_URL = "http://localhost:5678/webhook-test/chat-input";
+const LOCAL_WEBHOOK_URL = "http://localhost:5678/webhook/chat-input";
 const STORAGE_KEY = "market_chat_conversations_v1";
 
 const MODELS = [
@@ -21,35 +21,13 @@ const MODELS = [
 const makeId = () =>
     Date.now().toString() + Math.random().toString(16).slice(2);
 
-// 💡 NEW: ฟังก์ชันสำหรับแปลง URL รูปภาพในข้อความธรรมดาให้เป็น Markdown Image Syntax
-const convertUrlsToMarkdown = (text) => {
-    // 💡 แก้ไข Regex: ลบ $ ออกเพื่อให้จับคู่ URL ที่ไม่ได้อยู่จบสตริง
-    // และเพิ่ม \n\n หน้า URL เพื่อให้ ReactMarkdown ขึ้นบรรทัดใหม่และ render เป็น Block element
-    // Regex: ค้นหา URL ที่ลงท้ายด้วยนามสกุลรูปภาพ
-    const imageRegex = /(https?:\/\/[^\s]+?\.(jpe?g|png|gif|webp|svg|bmp))(\s*)/gi;
-
-    let result = text;
-    
-    // แปลง URL รูปภาพเป็น Markdown Image
-    // เราใช้ replaceAll เพื่อให้มั่นใจว่าครอบคลุมการค้นหาทั้งหมด (แม้ว่า .replace กับ flag g จะทำงานคล้ายกัน)
-    // การเพิ่ม \n\n จะช่วยแยกรูปภาพออกจากข้อความด้านบน
-    result = result.replace(imageRegex, (match, url, spacing) => {
-        // Alt Text ง่ายๆ
-        return `\n\n![Image](${url})${spacing}`; 
-    });
-
-    return result;
-};
-
 export default function Chat() {
     // 💡 HYDRATION FIX: ตั้งค่าเริ่มต้นเป็น []
     const [imageFile, setImageFile] = useState(null);
-    const [isMounted, setIsMounted] = useState(false); // 💡 NEW: State เพื่อจัดการ Hydration
+    const [isMounted, setIsMounted] = useState(false);
 
-    // 💡 HYDRATION FIX: กำหนดค่าเริ่มต้นเป็น [] เพื่อให้เซิร์ฟเวอร์เรนเดอร์เนื้อหาที่ว่างเปล่า (หรือ Loading)
     const [conversations, setConversations] = useState([]);
 
-    // 💡 HYDRATION FIX: โหลดข้อมูลจริงจาก Local Storage ใน useEffect
     useEffect(() => {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
@@ -73,7 +51,7 @@ export default function Chat() {
             console.warn("Cannot load conversations:", e);
         }
 
-        setIsMounted(true); // ตั้งค่าเป็น true เมื่อโหลดข้อมูลฝั่ง Client เสร็จสิ้น
+        setIsMounted(true);
     }, []);
 
     const [activeId, setActiveId] = useState("c1");
@@ -91,7 +69,6 @@ export default function Chat() {
     const [editingId, setEditingId] = useState(null);
     const [draftTitle, setDraftTitle] = useState("");
 
-    // 💡 HYDRATION FIX: รัน Scroll และ Local Storage Persist เมื่อ Mounted แล้วเท่านั้น
     useEffect(() => {
         if (!isMounted) return;
         const el = chatBodyRef.current;
@@ -107,7 +84,6 @@ export default function Chat() {
         }
     }, [conversations, isMounted]);
 
-    // ... (ส่วน openClearHistoryWindow, handleConfirmClearHistory, useEffect handleClickOutside เหมือนเดิม)
     const openClearHistoryWindow = () => {
         setClearConfirm(true);
     };
@@ -251,22 +227,37 @@ export default function Chat() {
         }
     };
 
-    const convertUrlsToMarkdown = (text) => {
-        const imageRegex = /(https?:\/\/[^\s]+?\.(jpe?g|png|gif|webp|svg|bmp))\s*$/i;
-
+    // ✅ ฟังก์ชันเดียวพอ และแมตช์ได้ทั้งมีคำว่า "รูปภาพ:" และ URL รูปทั่วไป
+    const convertUrlsToMarkdown = (text = "") => {
         let result = text;
-        result = result.replace(imageRegex, (match, url) => {
-            return `![Image](${url})`;
-        });
+
+        // 1) กรณีมีคำว่า "รูปภาพ: <url>"
+        result = result.replace(
+            /รูปภาพ:\s*(https?:\/\/[^\s]+?\.(?:jpe?g|png|gif|webp|svg|bmp))/gi,
+            (_match, url) => `\n\n![Image](${url})\n\n`
+        );
+
+        // 2) กรณี URL รูปที่ไม่มีคำว่า "รูปภาพ:"
+        result = result.replace(
+            /(https?:\/\/[^\s]+?\.(?:jpe?g|png|gif|webp|svg|bmp))/gi,
+            (_match, url) => `![Image](${url})`
+        );
 
         return result;
     };
 
+
+    // ใน Chat.jsx ประมาณบรรทัดที่ 262
+
     const enhance = (md = "") => {
-        let result = md.replace(/\*\*มติ:\*\*/g, "**มติ:**");
-        result = convertUrlsToMarkdown(result);
+        let result = convertUrlsToMarkdown(md);
+
+        // ถ้ายังอยากแทนที่ **รูปภาพ:** ก็ทำต่อได้
+        result = result.replace(/\*\*รูปภาพ:\*\*/g, "**รูปภาพ:**");
+
         return result;
-    }
+    };
+
 
     const sanitize = (md = "") => DOMPurify.sanitize(md);
     const sanitizeTitle = (t) => {

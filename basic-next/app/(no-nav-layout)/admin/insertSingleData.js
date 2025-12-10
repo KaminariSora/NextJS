@@ -26,7 +26,9 @@ async function upsertProduct(productData) {
         const collection = db.collection(COLLECTION_NAME);
 
         console.log("Generating embedding...");
-        const vectorEmbedding = await generateEmbedding(productData.description);
+        const nameEmbedding = await generateEmbedding(productData.name)
+        const descriptionEmbedding = await generateEmbedding(productData.description);
+        const genreEmbedding = await generateEmbedding(productData.genre)
         console.log("Embedding generated successfully.");
         
         let filter = {};
@@ -45,7 +47,9 @@ async function upsertProduct(productData) {
                 stock: productData.stock,
                 image: productData.image,
                 genre: productData.genre,
-                product_embedding: vectorEmbedding
+                name_embedding: nameEmbedding,
+                description_embedding: descriptionEmbedding,
+                genre_embedding: genreEmbedding
             }
         };
 

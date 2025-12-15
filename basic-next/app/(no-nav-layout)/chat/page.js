@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane, faCopy, faEllipsis, faImage } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane, faCopy, faEllipsis, faImage, faBars } from "@fortawesome/free-solid-svg-icons";
+import MenuIcon from "@/app/components/icons/menuIcon";
 import './chat.css'
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -22,7 +23,6 @@ const makeId = () =>
     Date.now().toString() + Math.random().toString(16).slice(2);
 
 export default function Chat() {
-    // 💡 HYDRATION FIX: ตั้งค่าเริ่มต้นเป็น []
     const [imageFile, setImageFile] = useState(null);
     const [isMounted, setIsMounted] = useState(false);
 
@@ -61,6 +61,7 @@ export default function Chat() {
     const [userMessage, setUserMessage] = useState("");
     const [status, setStatus] = useState("idle");
     const [error, setError] = useState("");
+    const [visible, setVisible] = useState(false)
     const [clearComfirm, setClearConfirm] = useState(false);
     const [openFormId, setOpenFormId] = useState(null);
     const chatBodyRef = useRef(null);
@@ -302,9 +303,17 @@ export default function Chat() {
         );
     }
 
+    const handleToggleHistoryBar = () => {
+        setVisible(!visible)
+        console.log(visible)
+    }
+
     return (
         <div className="content-container">
             <div className="content-header">
+                <div className="toggle-button">
+                    <FontAwesomeIcon icon={faBars} onClick={handleToggleHistoryBar}/>
+                </div>
                 <div className="header-name">
                     <h1>Market chat</h1>
                     <p>Internship Project</p>
@@ -333,7 +342,7 @@ export default function Chat() {
             </div>
 
             <div className="main-container">
-                <div className="history-box">
+                <div className={`history-box ${visible ? "visible" : ""}`}>
                     <button className="new-chat-btn" onClick={createNewChat}>
                         + New Chat
                     </button>

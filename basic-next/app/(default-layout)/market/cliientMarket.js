@@ -8,7 +8,7 @@ export default function ClientMarket({items}) {
     return (
         <div className="market-container">
             <h1 className="mitr-regular" id="market-heading">
-                สินค้าทั้งหมด(แค่ตัวอย่างไม่ได้ขายจริง)
+                สินค้าทั้งหมด
             </h1>
 
             <div className="market-list">

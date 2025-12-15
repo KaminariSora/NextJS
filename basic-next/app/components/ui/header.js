@@ -13,7 +13,10 @@ const Header = () => {
     }
     return(
         <header className="header">
-                <a href='/' className='logo'><img src='./Images/Pixela.png' alt='Pixela'></img></a>
+                <a href='/' className='logo'>
+                    <img src='./Market/Sora.png' alt='Pixela'></img>
+                    <p>Market</p>
+                </a>
                 <nav className="nav container">
                     {/* NavMenu */}
                     <div className={`navMenu ${showMenu ? 'showMenu' : ''}`}>

@@ -2,7 +2,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     height: 100dvh;
-    grid-template-rows: minmax(auto, 13%) 1fr;
+    grid-template-rows: minmax(auto, 8%) 1fr;
 }
 
 /* ---------- Header set up ---------- */
@@ -89,12 +89,21 @@ body {
     overflow: hidden;
 }
 
+.toggle-button {
+    display: none;
+}
+
 .history-box {
     color: var(--primary-color);
     min-width: 15%;
     max-width: 15%;
     overflow-y: scroll;
     position: relative;
+    display: none;
+}
+
+.visible {
+    display: block;
 }
 
 .history-box ul {
@@ -414,4 +423,26 @@ body {
 .confirm-window button:hover {
     cursor: pointer;
     background: var(--hover-pop-up-background-color);
+}
+
+@media only screen and (max-width: 769px) {
+    .content-header {
+        max-height: auto;
+    }
+
+    .header-name {
+        padding-left: 3rem;
+    }
+
+    .toggle-button {
+        position: absolute;
+        display: block;
+        z-index: 999;
+    }
+}
+
+@media only screen and (min-width: 769px) and (max-width: 2560px) {
+    .history-box {
+        display: block;
+    }
 }

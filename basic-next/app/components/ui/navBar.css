@@ -46,8 +46,21 @@ header ul li a {
 }
 
 .logo {
+    display: flex;
+    align-items: center;
+    /* border: 1px solid black; */
+    height: 100%;
     margin-left: 10%;
     margin-right: 15%;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.logo img {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
 }
 
 .navToggle,
